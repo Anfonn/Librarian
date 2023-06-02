@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from langchain.llms import OpenAI
@@ -6,6 +7,7 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains.qa_with_sources import load_qa_with_sources_chain 
 
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
@@ -14,10 +16,10 @@ def get_answer():
     data = request.get_json()
     query = data['query']
 
-    os.environ["OPENAI_API_KEY"] = ""
+    os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY')
 
     embedding_function = OpenAIEmbeddings()
-    persist_directory=r""
+    persist_directory= os.getenv('CHROMA_PERSIST_PATH')
     vectordb = Chroma(persist_directory=persist_directory, embedding_function=embedding_function)
     retriever = vectordb.as_retriever()
     
